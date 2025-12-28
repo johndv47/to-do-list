@@ -1,207 +1,307 @@
-"""To-Do list Program v2 
-Initializes a list where tasks will be stored.
-"""
-todo_list = []
+from pathlib import Path
 
+#Task is for task manipulation / task itself
+class Task:
 
-def greeting():
-    """Displays a greeting message to the user."""
-    print("\nWelcome to your to-do list!")
+    def __init__(self, controller):
+        """
+        Creates an instance of ToDo_List.
+        Calls: ToDo_List
+        """
+        self.controller = controller 
 
+    def add(self):
+        """
+        Add tasks to the todo_list.
+        Format: Name, Details, Status, Priority.
+        Calls: clear_screen, keep_adding, task_name todo_list.
+        """
+        self.controller.clear_screen()
+        print("\n--- Add Tasks (type 'done' to stop) ---")
 
-def menu():
-    """Displays the main menu."""
-    print("1. Add")
-    print("2. Edit")
-    print("3. View")
-    print("4. Delete")
-    print("5. Complete")
-    print("6. Exit")
+        task_name = input("Name of the task?: ")
+        if  task_name.lower() == "done":
+            self.controller.clear_screen()
+            return
 
+        details = input("Add details: " )
+        if details.lower() == "done":
+            self.controller.clear_screen()
+            return
 
-def clear_screen():
-    """Clears terminal window."""
-    print("\n" * 100)
+        priority = input("Enter priority of the task (High, Medium, Low): ")
+        if priority.lower() == "done":
+            self.controller.clear_screen()
+            return
 
+        task = {
+            "name": task_name, 
+            "details": details,
+            "status": "Incomplete",
+            "priority": priority
+            }
 
-def keep_adding(todo_list):
-    """
-    Prompts the user to continue adding items.
-    Utilized within the add definition.
-    Calls: add, clear_screen, todo_list.
-    """
-    keep_adding = input(str("\nContinue adding tasks? (y/n): "))
-    keep_adding = keep_adding.lower()
-    if keep_adding == "y":
-        add(todo_list)
-        return
-    elif keep_adding == "n":
-        clear_screen()
-        return
-    else:
-        input("Invalid choice. Press enter to return to the menu.")
-        clear_screen()
+        self.controller.todo_list.append(task)
+        self.controller.save_task()
+        self.controller.clear_screen()
+        self.task_name(task_name)
+        self.keep_adding()
 
+    def keep_adding(self):
+        """
+        Prompts the user to continue adding items.
+        Utilized within the add definition.
+        Calls: add, clear_screen.
+        """
+        keep_adding = input(str("\nContinue adding tasks? (y/n): "))
+        keep_adding = keep_adding.lower()
 
-def add(todo_list):
-    """
-    Add tasks to the todo_list dictionary.
-    Format: Name, Details, Status, Priority.
-    Calls: clear_screen, keep_adding, todo_list.
-    """
-    task_name = input("Name of the task? (type 'done' to return to menu): ")
-    if  task_name == "done":
-        clear_screen()
-        return
-    details = input("Add details (type 'done' to return to menu): ")
-    if details == "done":
-        clear_screen()
-        return
-    priority = input("Enter the priority of the task (type 'done' to return to menu): ")
-    if priority == "done":
-        clear_screen()
-        return
-    task = {"name": task_name, "details": details, "status": "Incomplete", "priority": priority}
-    todo_list.append(task)
-    clear_screen()
-    print(f"\n{task_name} added to your to-do list.")
-    keep_adding(todo_list)
+        if keep_adding == "y":
+            self.add()
+            return
 
-
-def edit(todo_list):
-    """
-    Edits task based on user input.
-    Calls: clear_screen, view, todo_list.
-    """
-    if not todo_list:
-        input("The list is empty. Press enter to continue.")
-        clear_screen()
-        return
-    view(todo_list)
-    try:
-        selection = int(input("\nSelect a task to edit: ")) - 1
-    except ValueError:
-        input("Invalid choice. Press enter to continue.")
-        clear_screen()
-        return
-    if 0 <= selection < len(todo_list):
-        updated_name = input("New name (leave blank to keep): ")
-        updated_details = input("New details (leave blank to keep): ")
-        updated_priority = input("New priority status (leave blank to keep): ")
-        if updated_name:
-            todo_list[selection]["name"] = updated_name
-        if updated_details:
-            todo_list[selection]["details"] = updated_details
-        if updated_priority:
-            todo_list[selection]["priority"] = updated_priority
-        clear_screen()
-        print(f"\n{todo_list[selection]['name']} updated.")
-    else:
-        input("Invalid choice. Press enter to continue.")
-        clear_screen()
-
-
-def view(todo_list):
-    """
-    Displays the current tasks.
-    Calls: clear_screen, todo_list.
-    """
-    if not todo_list:
-        input("The list is empty. Press enter to continue.")
-        clear_screen()
-        return
-    if todo_list:
-        clear_screen()
-        print("-" * 48)
-        print("----Task(s)----Details----Status----Priority----")
-        for z, task in enumerate(todo_list):
-            print(f"{z+1}. {task['name']} - {task['details']} - {task['status']} - {task['priority']}")
-
-def delete(todo_list):
-    """
-    Deletes task based on user input.
-    Calls: clear_screen, todo_list, view.
-    """
-    if not todo_list:
-        input("The list is empty. Press enter to continue.")
-        clear_screen()
-        return
-    view(todo_list)
-    try:
-        selection = int(input("\nSelect a task to delete: ")) - 1
-    except ValueError:
-        input("Invalid choice. Press enter to continue.")
-        clear_screen()
-        return
-    if 0 <= selection < len(todo_list):
-        del_task = todo_list[selection]['name']
-        del todo_list[selection]
-        clear_screen()
-        print(f"\n{del_task} has been deleted.")
-        return
-    else:
-        input("Invalid choice. Press enter to continue.")
-        clear_screen()
-
-def complete(todo_list):
-    """
-    Completes task based on user input.
-    Calls: clear_screen, todo_list, view.
-    """
-    if not todo_list:
-        input("The list is empty. Press enter to continue.")
-        clear_screen()
-        return
-    view(todo_list)
-    try:
-        selection = int(input("\nSelect a task to complete: ")) - 1
-        clear_screen()
-    except ValueError:
-        input("Invalid choice. Press enter to continue.")
-        clear_screen()
-        return
-    if 0 <= selection < len(todo_list):
-        if todo_list[selection]["status"] == "Complete":
-            print(f"{todo_list[selection]['name']} that task has already been completed.")
+        elif keep_adding == "n":
+            self.controller.clear_screen()
+            return
         else:
-            todo_list[selection]["status"] = "Complete"
-            completed_task = todo_list[selection]['name']
-            clear_screen()
-            print(f"\n{completed_task} marked as complete.")
-    else:
-        input("Invalid choice. Press enter to continue.")
-        clear_screen()
+            input("Invalid choice. Press enter to return to the menu.")
+            self.controller.clear_screen()
+
+    def complete(self):
+        """
+        Completes task based on user input.
+        Calls: clear_screen, todo_list, view_all.
+        """
+        if not self.controller.todo_list:
+            input("The list is empty. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+        self.view_all()
+        try:
+            selection = int(input("\nSelect a task to complete: ")) - 1
+            self.controller.clear_screen()
+        except ValueError:
+            input("Invalid choice. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+        if 0 <= selection < len(self.controller.todo_list):
+            if self.controller.todo_list[selection]["status"] == "Complete":
+                print(f"{self.controller.todo_list[selection]['name']} has already been completed.")
+            else:
+                self.controller.todo_list[selection]["status"] = "Complete"
+                completed_task = self.controller.todo_list[selection]['name']
+                self.controller.clear_screen()
+                print(f"\n{completed_task} marked as complete.")
+                self.controller.save_task()
+        else:
+            input("Invalid choice. Press enter to continue.")
+            self.controller.clear_screen()
 
 
-while True:
-    """
-    The main loop.
-    Greets user, displays menu, and handles user input.
-    Calls: add, complete, delete, edit, greeting, menu, view.
-    """
-    greeting()
-    menu()
-    choice = input("\nMake a selection (1-6): ")
+
+
+    def edit(self):
+        """
+        Edits task based on user input.
+        Calls: clear_screen, view_all, todo_list.
+        """
+        if not self.controller.todo_list:
+            input("The list is empty. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+        self.view_all()
+        try:
+            selection = int(input("\nSelect a task to edit: ")) - 1
+        except ValueError:
+            input("Invalid choice. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+        if 0 <= selection < len(self.controller.todo_list):
+            updated_name = input("New name (leave blank to keep): ")
+            updated_details = input("New details (leave blank to keep): ")
+            updated_priority = input("New priority (leave blank to keep): ")
+            if updated_name:
+                self.controller.todo_list[selection]["name"] = updated_name
+            if updated_details:
+                self.controller.todo_list[selection]["details"] = updated_details
+            if updated_priority:
+                self.controller.todo_list[selection]["priority"] = updated_priority
+            self.controller.clear_screen()
+            print(f"\n{self.controller.todo_list[selection]['name']} updated.")
+            self.controller.save_task()
+        else:
+            input("Invalid choice. Press enter to continue.")
+            self.controller.clear_screen()
+
+
+
+
+    def view_all(self):
+        """
+        Displays the current tasks.
+        Calls: clear_screen, task_display, todo_list.
+        """
+        if not self.controller.todo_list:
+            input("The list is empty. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+        if self.controller.todo_list:
+            self.controller.clear_screen()
+            self.task_display()
+
+    def view_incomp(self):
+        """
+        Displays only incomplete tasks.
+        Calls: clear_screen, todo_list.
+        """
+        if not self.controller.todo_list:
+            input("The list is empty. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+
+        self.controller.clear_screen()
+        print("--- Incomplete Tasks ----")
+        track = False
+
+        for z, task in enumerate(self.controller.todo_list):
+            if task["status"] == "Incomplete":
+                print(f"{z+1}. {task['name']} | {task['details']} | Status: {task['status']} | Priority: {task['priority']}")
+                track = True
+
+        if not track:
+            input("All tasks are complete. Press enter to return to the menu.")
+            self.controller.clear_screen()
+
+    def delete(self):
+        """
+        Deletes task based on user input.
+        Calls: clear_screen, todo_list, view_all.
+        """
+        if not self.controller.todo_list:
+            input("The list is empty. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+        self.view_all()
+        try:
+            selection = int(input("\nSelect a task to delete: ")) - 1
+        except ValueError:
+            input("Invalid choice. Press enter to continue.")
+            self.controller.clear_screen()
+            return
+        if 0 <= selection < len(self.controller.todo_list):
+            del_task = self.controller.todo_list[selection]['name']
+            del self.controller.todo_list[selection]
+            self.controller.clear_screen()
+            print(f"\n{del_task} has been deleted.")
+            self.controller.save_task()
+            return
+        else:
+            input("Invalid choice. Press enter to continue.")
+            self.controller.clear_screen()
+
+    def task_display(self):
+        """
+        Displays an enumerated list of tasks.
+        Calls: todo_list.
+        """
+        print("--- All Tasks ---")
+        for z, task in enumerate(self.controller.todo_list):
+            print(f"{z+1}. {task['name']} | {task['details']} | Status: {task['status']} | Priority: {task['priority']}")
+
+    
+    def task_name(self, name):
+        """
+        Displays the name of task added to list.
+        Calls: todo_list.
+        """
+        print(f"{name} added to your to-do list.")
+
+# ToDo_List is for menu navigation
+class ToDo_List:
+    def __init__(self):
+        """
+        Initialize todo list.
+        """
+        self.todo_list = []
+        self.load_task()
+
+    def save_task(self):
+        path = Path("tasks.txt")
+        with path.open("w", encoding="utf-8") as z:
+            for task in self.todo_list:
+                line = f"{task['name']}|{task['status']}|{task['details']}|{task['priority']}"
+                z.write(line + "\n")
+
+
+    def load_task(self):
+        path = Path("tasks.txt")
+        if path.exists():
+            with path.open("r", encoding="utf-8") as z:
+                for line in z:
+                    split = line.strip().split("|")
+                    if len(split) == 4:
+                        name, status, details, priority = split
+                        task = {
+                            "name": name,
+                            "status": status,
+                            "details": details,
+                            "priority": priority,
+                        }
+                        self.todo_list.append(task)
+
+    def menu(self):
+        """
+        Main loop that handles menu display & user input.
+        Calls: add, view_all, view_incomp, edit, complete,
+               delete, clear_screen, Task.
+        Note: The task variable allows class interaction.
+        """
+        task = Task(self)
+        while True:
+            print("\n")
+            print("--- To-Do List Menu ---")
+            print("1. Add")
+            print("2. View All")
+            print("3. View Incomplete")
+            print("4. Edit")
+            print("5. Complete")
+            print("6. Delete")
+            print("7. Exit")
+
+            choice = input("\nMake a selection (1-7): ")
    
-    if choice == "1":
-        add(todo_list)
+            if choice == "1":
+                task.add()
 
-    elif choice == "2":
-        edit(todo_list)
+            elif choice == "2":
+                task.view_all()
+        
+            elif choice == "3":
+                task.view_incomp()
 
-    elif choice == "3":        
-        view(todo_list)
+            elif choice == "4":        
+                task.edit()
 
-    elif choice == "4":
-        delete(todo_list)
+            elif choice == "5":
+                task.complete()
 
-    elif choice == "5":
-        complete(todo_list)
+            elif choice == "6":
+                task.delete()
 
-    elif choice == "6":
-        print("Exiting...")
-        break
+            elif choice == "7":
+                print("Exiting...")
+                break
 
-    else:
-        input("Invalid choice. Press enter to continue.")
-        clear_screen()
+            else:
+                input("Invalid choice. Press enter to continue.")
+                self.clear_screen()
+
+    def clear_screen(self):
+        """Prints 100 blank lines, clearing terminal."""
+        print("\n" * 100)
+
+"""
+Runs the program.
+"""
+run = ToDo_List()
+run.menu()
